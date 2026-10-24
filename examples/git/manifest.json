@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "target": "git",
+  "target_version": "\u003e=2.54",
+  "version_probe": {
+    "args": [
+      "--version"
+    ],
+    "regex": "(\\d+\\.\\d+(\\.\\d+)?)"
+  },
+  "skills": [
+    {
+      "name": "safe-history",
+      "path": "skills/safe-history/SKILL.md",
+      "description": "Commit, branch, and rebase safely in a git worktree: preconditions, expected observations, rollback, and no hooks bypassed or published history rewritten.",
+      "level": "intermediate",
+      "tags": [
+        "git",
+        "history",
+        "rebase",
+        "commit",
+        "branch"
+      ],
+      "commands": [
+        "status",
+        "diff",
+        "log",
+        "show",
+        "commit",
+        "rebase",
+        "switch",
+        "checkout",
+        "branch",
+        "fetch",
+        "reset"
+      ],
+      "prerequisites": [
+        "soul-worktree-flow"
+      ],
+      "next": [],
+      "checksum": "sha256:35a29387645c082eb74697ce9de2f626ed6cc8ba014e09e30899a0df7b11a117"
+    },
+    {
+      "name": "soul-worktree-flow",
+      "path": "skills/soul-worktree-flow/SKILL.md",
+      "description": "Check in, create or reuse a linked git worktree under \u003csoulDir\u003e/worktrees/\u003cname\u003e, work there, and clean up; never branch or edit in the owner's primary checkout.",
+      "level": "beginner",
+      "tags": [
+        "git",
+        "worktree",
+        "soul",
+        "branch"
+      ],
+      "commands": [
+        "status",
+        "worktree",
+        "branch",
+        "config",
+        "rev-parse",
+        "fetch"
+      ],
+      "prerequisites": [],
+      "next": [
+        "safe-history"
+      ],
+      "checksum": "sha256:1a77965a9b88c34b397c530117a70410a1a27e72af900777da95472526e994e8"
+    }
+  ]
+}

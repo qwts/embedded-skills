@@ -1,2 +1,5 @@
 # macOS Finder metadata — created in any directory Finder touches.
 .DS_Store
+
+# Shim build artifacts.
+dist/

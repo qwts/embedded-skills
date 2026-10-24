@@ -12,6 +12,8 @@ the workflows, load the one that fits, then run the real commands.
   `gh` with a 4-skill corpus for GitHub's CLI. `make install` there puts
   it on your `PATH`; every non-`skills` invocation execs your real `gh`
   untouched.
+- **Git target:** [`examples/git/`](examples/git/) — a Go shim named
+  `git` with a 2-skill corpus for Git worktree/history workflows.
 - **Working on this repo as an agent:** load
   [`.agents/skills/embedded-skills/SKILL.md`](.agents/skills/embedded-skills/SKILL.md).
   It is the one root contributor skill: add a target skill, add a new CLI
