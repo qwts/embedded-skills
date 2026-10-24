@@ -62,6 +62,12 @@ markers automatically.
    The bind exchange writes `<git-dir>/agent-binding.json` and establishes the
    live session binding.
 
+   If your harness has no MCP surface, use the CLI equivalent where
+   available: `agent-bot session bind --transcript-id <session-id>` performs
+   the same daemon exchange without MCP (added after 0.12.0 — check
+   `agent-bot session --help`). With an existing binding it only validates
+   it at the daemon, so running it is always safe.
+
    Expected: the bind tool returns the bound agent ID and worktree. If the
    bind token was already spent or expired, re-run `agent-bot join` to mint a
    fresh one, then retry the bind.
@@ -76,6 +82,8 @@ markers automatically.
    - Installed hooks and chained hooks path.
    - Identity daemon supervisor healthy.
    - `worktree.binding` reports the worktree is bound to your App.
+   - `worktree.session_binding` reports `ready` — the live-binding check,
+     distinct from the worktree pin above.
 
    The doctor report separates worktree binding from session binding. A
    worktree can be configured (App pinned, attribution written) while the

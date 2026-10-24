@@ -7,7 +7,7 @@ tags: [git, publish, sign, bot, identity, commit]
 triggers: [signed commit, verified commit, publish as bot, signed-commit, push as agent, verified push]
 commands: [signed-commit]
 requires:
-  - "the live session binding is established (MCP bind exchange completed, or agent-binding.json present in the git dir)"
+  - "the live session binding is established (agent-bot doctor reports worktree.session_binding ready)"
   - "agent-bot doctor shows a resolved bot identity for this worktree"
   - "the worktree is clean (git status --porcelain is empty)"
   - "the commit range is linear (no merge commits between base and HEAD)"
@@ -32,11 +32,15 @@ a bot identity.
 
 1. Verify the live session binding is established. A worktree can resolve a
    bot identity while the session is unbound — publishing then fails closed
-   mid-flow. Check that `<git-dir>/agent-binding.json` exists:
-   `test -f "$(git rev-parse --git-dir)/agent-binding.json"`.
-   Expected: exit 0. If the file is missing, complete the MCP `bind` exchange
-   (see `join-and-bind` step 4) before proceeding. Do not attempt to publish
-   from an unbound session.
+   mid-flow. Run `agent-bot doctor --json` and confirm the
+   `worktree.session_binding` check reports `ready`. File presence is NOT
+   the test: `<git-dir>/agent-binding.json` can exist stale, revoked, or
+   naming a different soul than the checkout pin, and publishing still
+   refuses. Expected: `worktree.session_binding` is `ready`. If it warns
+   `session-binding-missing`, establish the binding first (see
+   `join-and-bind` step 4). If it fails `session-binding-unreadable`, fix
+   the binding with `agent-bot setup-worktree`, then bind. Do not attempt
+   to publish from an unbound session.
 
 2. Verify your bot identity is resolved. Run `agent-bot doctor --json` and
    confirm `identity.class` is not `human` and an App slug is resolved.

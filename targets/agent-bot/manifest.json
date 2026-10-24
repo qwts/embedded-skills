@@ -32,7 +32,7 @@
       "next": [
         "verified-publish"
       ],
-      "checksum": "sha256:1a694a3fb8ca3f94955b2b4547b5920aefd7e9d0b624179409e2f67455e00693"
+      "checksum": "sha256:465945cc14784d244b70d8c33a8e8276fc6af7e960623914170ae49678652aaa"
     },
     {
       "name": "verified-publish",
@@ -52,7 +52,7 @@
       ],
       "prerequisites": [],
       "next": [],
-      "checksum": "sha256:3edd1b88798954cbccabbff833a447aa06a5482fe89160ff4147fe368c13a151"
+      "checksum": "sha256:45bdee41d3f29d1f317baeee351d76412bbc5d412b295826d00348b84d0fd82f"
     }
   ]
 }
