@@ -34,9 +34,10 @@ otherwise. Start from the repository root.
   (gh extensions, `git-<command>` dispatch, kubectl plugins, etc.).
 - No script shims for delivered targets. Build-time helper scripts are
   allowed only where the existing `examples/gh` pattern already uses them.
-- Current reference implementation: `examples/gh/`. A generic
-  `targets/<cli>/` tree is the design direction (docs/06), but it does not
-  exist yet; do not write instructions or paths that pretend it does.
+- Current reference implementation: `examples/gh/`. The shared shim module
+  is `shim/` (one codebase, many targets, docs/06); the first target built
+  on it is `targets/agent-bot/`. `examples/gh/` keeps its own copy of the
+  shim code until it is migrated onto `shim/`.
 - A skill embedded for a target agent (for example under
   `examples/gh/skills/`) is **content in this repo's product format**.
   This root skill is a **contributor skill for working on the repo**.

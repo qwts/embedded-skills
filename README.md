@@ -12,6 +12,12 @@ the workflows, load the one that fits, then run the real commands.
   `gh` with a 4-skill corpus for GitHub's CLI. `make install` there puts
   it on your `PATH`; every non-`skills` invocation execs your real `gh`
   untouched.
+- **Shared shim module:** [`shim/`](shim/) — the generic, target-independent
+  shim code (one codebase, many targets, docs/06), extracted from the gh
+  example.
+- **First target on the shared module:**
+  [`targets/agent-bot/`](targets/agent-bot/) — a shim named `agent-bot`
+  with the `join-and-bind` and `verified-publish` workflow skills.
 - **Working on this repo as an agent:** load
   [`.agents/skills/embedded-skills/SKILL.md`](.agents/skills/embedded-skills/SKILL.md).
   It is the one root contributor skill: add a target skill, add a new CLI

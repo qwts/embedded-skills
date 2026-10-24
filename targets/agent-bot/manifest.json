@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "target": "agent-bot",
+  "target_version": "\u003e=0.12.0 \u003c0.13.0",
+  "version_probe": {
+    "args": [
+      "--version"
+    ],
+    "regex": "(\\d+\\.\\d+(\\.\\d+)?)"
+  },
+  "skills": [
+    {
+      "name": "join-and-bind",
+      "path": "skills/join-and-bind/SKILL.md",
+      "description": "Check in as a soul and bind this checkout: join, MCP bind, setup-worktree, doctor, and the fail-closed errors for a missing App, missing binding, or wrong checkout. Use when starting a fresh session",
+      "level": "intermediate",
+      "tags": [
+        "agent-bot",
+        "join",
+        "bind",
+        "soul",
+        "worktree",
+        "mcp",
+        "setup"
+      ],
+      "commands": [
+        "join",
+        "setup-worktree",
+        "mcp",
+        "doctor"
+      ],
+      "prerequisites": [],
+      "next": [
+        "verified-publish"
+      ],
+      "checksum": "sha256:4a477bf1f2b5a961ec86fa7f3bf63e148f83beb4575f30ce26591dae22b05db6"
+    },
+    {
+      "name": "verified-publish",
+      "path": "skills/verified-publish/SKILL.md",
+      "description": "Publish a branch as the bot with GitHub-verified signatures: signed-commit preconditions, dry-run, publish, recovery, and on-GitHub confirmation. Use when a branch is ready to publish as the bot",
+      "level": "advanced",
+      "tags": [
+        "agent-bot",
+        "publish",
+        "signed-commit",
+        "github",
+        "verified",
+        "bot"
+      ],
+      "commands": [
+        "signed-commit",
+        "doctor",
+        "mint-token"
+      ],
+      "prerequisites": [
+        "join-and-bind"
+      ],
+      "next": [],
+      "checksum": "sha256:401aae8a608e75722fbf00bfc72a98fd416039d213f3e6bd34ac2db51fb67a47"
+    }
+  ]
+}
