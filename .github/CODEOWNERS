@@ -12,6 +12,7 @@
 # includes the skill corpora — SKILL.md files steer shell-privileged agents.
 AGENTS.md   @qwts
 CLAUDE.md   @qwts
+.agents/    @qwts
 .claude/    @qwts
 .codex/     @qwts
 examples/gh/skills/    @qwts
