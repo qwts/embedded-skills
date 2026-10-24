@@ -193,9 +193,10 @@ $ cli commit -m "fix: handle empty input in parser"
 - `pr-flow` — once the commit is on a branch and ready for review
 ```
 
-For a complete skill written against a real target (gh), see
-`examples/gh/pr-flow/SKILL.md`. For how to write skills agents actually
-trigger on and follow, see `08-skill-authoring.md`.
+For complete skills written against a real target — a working gh corpus
+inside a runnable shim you can install — see `../../examples/gh/` in this
+repo (start at `skills/pr-flow/SKILL.md` there). For how to write skills
+agents actually trigger on and follow, see `08-skill-authoring.md`.
 
 ## Validation (`cli skills check`)
 

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "target": "gh",
+  "target_version": "\u003e=2.40",
+  "version_probe": {
+    "args": [
+      "--version"
+    ],
+    "regex": "(\\d+\\.\\d+(\\.\\d+)?)"
+  },
+  "skills": [
+    {
+      "name": "issue-flow",
+      "path": "skills/issue-flow/SKILL.md",
+      "description": "File or triage a GitHub issue without creating duplicates. Use when reporting a bug, requesting work, or labeling and assigning existing issues",
+      "level": "beginner",
+      "tags": [
+        "vcs",
+        "issue",
+        "triage"
+      ],
+      "commands": [
+        "issue list",
+        "issue view",
+        "issue create",
+        "issue edit",
+        "label list"
+      ],
+      "prerequisites": [],
+      "next": [
+        "pr-flow"
+      ],
+      "checksum": "sha256:42ebfb7b8657300dbfc907b3bf237586a0564d358f7c1969b33c1a11c06a3a77"
+    },
+    {
+      "name": "pr-flow",
+      "path": "skills/pr-flow/SKILL.md",
+      "description": "Open a pull request with a complete title, body, and reviewers. Use when a branch has commits ready for review",
+      "level": "intermediate",
+      "tags": [
+        "vcs",
+        "pr",
+        "review"
+      ],
+      "commands": [
+        "pr status",
+        "repo view",
+        "pr create",
+        "pr edit",
+        "pr view"
+      ],
+      "prerequisites": [],
+      "next": [
+        "review-flow",
+        "pr-merge"
+      ],
+      "checksum": "sha256:ddb5e199eac3c9b57a036c61f704eb07db9dce86dc7c13fa0ab7baea6cdbc6aa"
+    },
+    {
+      "name": "pr-merge",
+      "path": "skills/pr-merge/SKILL.md",
+      "description": "Land an approved, green pull request with the right merge method. Use when a PR is approved and ready to merge",
+      "level": "advanced",
+      "tags": [
+        "vcs",
+        "pr",
+        "merge"
+      ],
+      "commands": [
+        "pr view",
+        "pr checks",
+        "pr merge"
+      ],
+      "prerequisites": [
+        "pr-flow",
+        "review-flow"
+      ],
+      "next": [],
+      "checksum": "sha256:15e28d5f845bb0a986c7c39a2fd9e1321cc35ad753a6a1186ba15bb22f959d9a"
+    },
+    {
+      "name": "review-flow",
+      "path": "skills/review-flow/SKILL.md",
+      "description": "Review a pull request properly before approving or requesting changes. Use when asked to review, check, or give feedback on a PR",
+      "level": "intermediate",
+      "tags": [
+        "vcs",
+        "pr",
+        "review"
+      ],
+      "commands": [
+        "pr view",
+        "pr diff",
+        "pr checks",
+        "pr review"
+      ],
+      "prerequisites": [
+        "pr-flow"
+      ],
+      "next": [
+        "pr-merge"
+      ],
+      "checksum": "sha256:ef118446775ab2c2a39a126f4ff95b81f6a5bfa8a40d1ac0c0ccdab153f2d8a4"
+    }
+  ]
+}

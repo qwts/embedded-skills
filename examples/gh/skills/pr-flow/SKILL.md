@@ -5,12 +5,13 @@ level: intermediate
 risk: mutating
 tags: [vcs, pr, review]
 triggers: [pull request, open a pr, code review, ready for review]
-commands: [pr status, pr diff, pr create, pr edit, pr view]
+commands: [pr status, repo view, pr create, pr edit, pr view]
 requires:
   - "gh pr status shows no open pull request for this branch"
-  - "the branch is pushed to origin"
+  - "the branch is pushed to origin (git status shows no unpushed commits)"
+  - "gh auth status succeeds for the target host"
 min_version: "2.40"
-prerequisites: [commit-flow, branch-flow]
+prerequisites: []
 next: [review-flow, pr-merge]
 completes_with: pr create
 ---
@@ -28,12 +29,17 @@ a reviewer can act on without asking questions.
    branch. Expected: the "Current branch" section reports no pull request.
    If one exists, stop here and update it with `gh pr edit` instead (see
    Edge cases).
-2. Run `gh pr diff` to review the full diff you are about to send.
+2. Review the full diff you are about to send. There is no pull request
+   yet, so `gh pr diff` cannot do this — diff against the base branch:
+   `base=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)`,
+   then `git fetch origin "$base"` and `git diff "origin/$base...HEAD"`.
    Expected: only the changes belonging to this branch. If unrelated
    changes appear, they belong on another branch — stop and say so.
-3. Read the repo's pull request template (`.github/pull_request_template.md`)
-   and follow its sections. If no template exists, use Summary, Test plan,
-   Risks (see Edge cases).
+3. Read the repo's pull request template and follow its sections. GitHub
+   looks in `.github/pull_request_template.md`, `pull_request_template.md`,
+   `docs/pull_request_template.md`, and `.github/PULL_REQUEST_TEMPLATE/`
+   (details in `references/body-template.md`). If none exists, use
+   Summary, Test plan, Risks.
 4. Run `gh pr create --title "<title>" --body "<body>"` with a title that
    states the change and a body that states the why, the test plan, and any
    risks. Expected: the command prints the new pull request's URL. If it
@@ -51,7 +57,8 @@ a reviewer can act on without asking questions.
 
 ```console
 $ gh pr status
-$ gh pr diff
+$ base=$(gh repo view --json defaultBranchRef --jq .defaultBranchRef.name)
+$ git fetch origin "$base" && git diff "origin/$base...HEAD"
 $ gh pr create --title "fix: handle empty input in parser" --body "<body following the repo template>"
 $ gh pr edit --add-reviewer octocat --add-label bug
 $ gh pr view --json url,reviewRequests,labels
@@ -68,7 +75,6 @@ $ gh pr view --json url,reviewRequests,labels
 
 ## See also
 
-- `commit-flow` — land the commits first
-- `branch-flow` — when the work needs its own branch
-- `review-flow` — once the pull request is open, review others'
-- `pr-merge` — when the pull request is approved and ready to land
+- `review-flow` — once the pull request is open, review someone else's
+- `pr-merge` — when a pull request is approved and green, land it
+- `references/body-template.md` — template locations and `--body-file`

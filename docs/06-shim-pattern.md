@@ -64,6 +64,16 @@ Rules for a correct shadow shim:
   otherwise bite. If the only candidate is the shim itself, error clearly
   instead of looping. Honor an env override for managed environments
   (`SKILLS_REAL_BIN=/usr/bin/gh gh ...`). Never resolve via a shell.
+- **Stacked shims.** The machine may already wrap the target (an
+  identity/token script is the common case): that wrapper resolves *its*
+  real binary by scanning PATH, finds this shim first, and execs it back.
+  Skip-self alone cannot break that cycle. Thread a visited set of
+  resolved paths through a namespaced env var: every handoff appends the
+  path handed to, and resolution skips anything already visited. The
+  intermediary wrapper still runs once, so whatever env it sets is in
+  place when the chain reaches the true binary. (This is not
+  hypothetical: the reference example hit exactly this loop against an
+  agent-identity gh wrapper, and ships the visited-set mechanism.)
 - **Pass-through fidelity.** Inherit stdio (no buffering), propagate the exit
   code, forward signals. The shim must be invisible for everything it does not
   handle — including the target's own `--help` and shell completion.
@@ -166,7 +176,8 @@ embedded-skills/
 ## Build and install
 
 1. Write the corpus under `targets/<target>/skills/` (doc 02 format; a
-   complete gh skill lives at `examples/gh/pr-flow/SKILL.md`).
+   complete, runnable gh instance of this whole pattern lives at
+   `../../examples/gh/`).
 2. Generate `targets/<target>/manifest.json` at build time.
 3. Build the shim binary per target, embedding that target's corpus. The
    installed artifact is named **exactly** `<target>` — that name is the

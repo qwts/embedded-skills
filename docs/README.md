@@ -79,7 +79,7 @@ is visible before anything runs.
 | `07-discovery-and-risks.md` | The bootstrap problem: discovery channels, probing contract, risk register, anti-patterns, phasing |
 | `08-skill-authoring.md` | How to write skills agents trigger on and follow: trigger fields, tier discipline, review checklist |
 | `09-implementation-and-evals.md` | Reference implementation: proxy fidelity, version probing, validation thresholds, evals, signed releases |
-| `examples/gh/pr-flow/SKILL.md` | A complete skill written against a real target (gh), in the doc 02 format |
+| `../../examples/gh/` | A runnable gh reference example: shim binary source, 4-skill corpus, manifest, PATH-install walkthrough |
 | `examples/agents-md-snippet.md` | Paste-able AGENTS.md snippet that bootstraps skill discovery |
 
 ## Example
