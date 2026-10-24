@@ -9,6 +9,7 @@
 
 GO      ?= go
 SHIM_DIR ?= $(HOME)/.local/share/skills-shims/bin
+GENMANIFEST ?= $(GO) run ../../shim/cmd/genmanifest
 
 .PHONY: build install uninstall test check manifest clean
 
@@ -18,7 +19,7 @@ build:
 # Staleness is caught by `make test` (checksum gate) and `make check`,
 # which refuse to run against a manifest that disagrees with skills/.
 manifest:
-	$(GO) run ./cmd/genmanifest .
+	$(GENMANIFEST) . gh ">=2.40" '(\d+\.\d+(\.\d+)?)'
 
 test:
 	$(GO) test ./...
