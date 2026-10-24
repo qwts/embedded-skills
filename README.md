@@ -12,6 +12,11 @@ the workflows, load the one that fits, then run the real commands.
   `gh` with a 4-skill corpus for GitHub's CLI. `make install` there puts
   it on your `PATH`; every non-`skills` invocation execs your real `gh`
   untouched.
+- **Working on this repo as an agent:** load
+  [`.agents/skills/embedded-skills/SKILL.md`](.agents/skills/embedded-skills/SKILL.md).
+  It is the one root contributor skill: add a target skill, add a new CLI
+  target, or build/install a local shim, with each procedure disclosed
+  only when needed.
 
 ```console
 $ cd examples/gh && make install
