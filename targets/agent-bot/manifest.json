@@ -19,7 +19,6 @@
         "join",
         "soul",
         "worktree",
-        "mcp",
         "bind",
         "agent-comms",
         "setup"
@@ -27,14 +26,13 @@
       "commands": [
         "join",
         "setup-worktree",
-        "doctor",
-        "mcp"
+        "doctor"
       ],
       "prerequisites": [],
       "next": [
         "verified-publish"
       ],
-      "checksum": "sha256:3cd14acdf99a75276dd6cd8129339a2968273cb68b41c443ebb1cf6fd7fc8ce2"
+      "checksum": "sha256:1a694a3fb8ca3f94955b2b4547b5920aefd7e9d0b624179409e2f67455e00693"
     },
     {
       "name": "verified-publish",
@@ -54,7 +52,7 @@
       ],
       "prerequisites": [],
       "next": [],
-      "checksum": "sha256:e7c3a0ac29e3980fed33c2ffd83d4199f63b1bcf968abb4370bb4c59f526cc4e"
+      "checksum": "sha256:3edd1b88798954cbccabbff833a447aa06a5482fe89160ff4147fe368c13a151"
     }
   ]
 }

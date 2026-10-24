@@ -110,9 +110,12 @@ $ agent-bot doctor                 # proxy: real agent-bot doctor
 ## Collision policy
 
 `agent-bot` already has a `skill` subcommand (singular). The shim intercepts
-`skills` (plural), which does not collide. If `agent-bot` ever grows a
-`skills` subcommand, the shim's collision policy applies: the real behavior
-wins (the shim probes `<real> skills --help` before serving).
+`skills` (plural), which does not collide today. The shim does not probe the
+real binary before serving — it intercepts a leading `skills` unconditionally.
+If `agent-bot` ever grows a `skills` subcommand, the shim will shadow it;
+the design's collision policy (real behavior wins, via a `<real> skills --help`
+probe) is documented in `../../docs/06-shim-pattern.md` but not yet implemented
+in this shim.
 
 ## Add or edit a skill
 

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -54,6 +55,14 @@ func main() {
 	targetName := os.Args[2]
 	targetVersion := os.Args[3]
 	versionRegex := os.Args[4]
+
+	// Validate the probe regex at manifest-generation time. An uncompilable
+	// regex would produce a manifest that builds fine but makes probeVersion
+	// silently return empty forever — detection reads as "unknown" and
+	// version_ok is always true. Fail fast instead.
+	if _, err := regexp.Compile(versionRegex); err != nil {
+		fatal(fmt.Errorf("invalid version probe regex %q: %w", versionRegex, err))
+	}
 
 	skillsDir := filepath.Join(root, "skills")
 	entries, err := os.ReadDir(skillsDir)
