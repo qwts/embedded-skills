@@ -1,4 +1,4 @@
-package main
+package shim
 
 import (
 	"context"
@@ -59,7 +59,7 @@ func childEnv(real string) []string {
 	return append(env, kv)
 }
 
-// resolveRealBinary finds the real target binary: SKILLS_REAL_GH /
+// resolveRealBinary finds the real target binary: SKILLS_REAL_<TARGET> /
 // SKILLS_REAL_BIN override first, else walk PATH in order skipping any
 // entry that is this shim (compared with os.SameFile after resolving
 // symlinks, never string equality) and anything already visited in this

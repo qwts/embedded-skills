@@ -1,9 +1,9 @@
 # Add a new CLI target and shim
 
 Use this when an arbitrary executable needs an embedded-skills corpus but
-has no shim in this repository yet. The current runnable reference is
-`examples/gh/`; the design target is the generic layout in `docs/06`.
-Do not pretend a `targets/<cli>/` implementation exists until it is built.
+has no shim in this repository yet. The shared shim codebase lives in
+`shim/`; the reference example is `examples/gh/`; production targets live
+under `targets/<cli>/`. The first production target is `targets/agent-bot/`.
 
 Read first:
 
@@ -39,16 +39,19 @@ first target happens to offer one.
 
 ## 2. Choose the implementation shape without duplicating blindly
 
-For the first target beyond `gh`, stop and decide explicitly:
+The shared shim codebase already lives in `shim/` (extracted from
+`examples/gh/`). New targets import it via a `replace` directive in their
+`go.mod`; they never duplicate proxy, parsing, rendering, export, or
+validation logic. A target directory contains only:
 
-- extract the tested shim behavior from `examples/gh/` into reusable
-  target-independent code, leaving per-target data as corpus + manifest; or
-- keep a second self-contained example only if the request is explicitly
-  an example/prototype, and record that duplication as debt in the PR/report.
+- `main.go` — thin wrapper: `embed` the corpus, call `shim.Run(target, corpus, os.Args)`
+- `go.mod` — module with `replace embedded-skills/shim => ../../shim`
+- `Makefile` — build/install/test/check/manifest (same shape as `examples/gh/Makefile`)
+- `skills/` — the corpus (doc 02 format)
+- `manifest.json` — generated
+- `README.md` — install and usage docs
 
-Production targets should not accumulate independently drifting copies of
-proxy, parsing, rendering, export, and validation logic. Preserve the
-tested invariants from the reference implementation:
+Preserve the tested invariants from the shared implementation:
 
 - compiled binary, embedded corpus, no runtime download;
 - `skills` handled locally; all other invocations proxied;

@@ -1,8 +1,10 @@
-// genmanifest regenerates ../../manifest.json from ../../skills/.
+// genmanifest regenerates manifest.json from skills/ in the target directory.
 // The manifest is generated, never hand-edited (docs/03). Run via
 // `make manifest` after adding or editing a skill; CI fails if the
-// checked-in copy is stale, and `gh skills check` verifies checksums
+// checked-in copy is stale, and `<target> skills check` verifies checksums
 // at runtime.
+//
+// Usage: genmanifest <target-dir> <target-name> <target-version> <version-regex>
 //
 // This tool parses only the manifest-relevant frontmatter fields, in the
 // same restricted subset the shim parses (scalars + flow lists). It is a
@@ -16,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -44,18 +47,31 @@ type Manifest struct {
 }
 
 func main() {
-	root := "."
-	if len(os.Args) > 1 {
-		root = os.Args[1] // example dir; default: run from examples/gh
+	if len(os.Args) < 5 {
+		fmt.Fprintln(os.Stderr, "usage: genmanifest <target-dir> <target-name> <target-version> <version-regex>")
+		os.Exit(1)
 	}
+	root := os.Args[1]
+	targetName := os.Args[2]
+	targetVersion := os.Args[3]
+	versionRegex := os.Args[4]
+
+	// Validate the probe regex at manifest-generation time. An uncompilable
+	// regex would produce a manifest that builds fine but makes probeVersion
+	// silently return empty forever — detection reads as "unknown" and
+	// version_ok is always true. Fail fast instead.
+	if _, err := regexp.Compile(versionRegex); err != nil {
+		fatal(fmt.Errorf("invalid version probe regex %q: %w", versionRegex, err))
+	}
+
 	skillsDir := filepath.Join(root, "skills")
 	entries, err := os.ReadDir(skillsDir)
 	if err != nil {
 		fatal(err)
 	}
-	m := Manifest{Version: 1, Target: "gh", TargetVersion: ">=2.40"}
+	m := Manifest{Version: 1, Target: targetName, TargetVersion: targetVersion}
 	m.VersionProbe.Args = []string{"--version"}
-	m.VersionProbe.Regex = `(\d+\.\d+(\.\d+)?)`
+	m.VersionProbe.Regex = versionRegex
 
 	var dirs []string
 	for _, e := range entries {
