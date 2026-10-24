@@ -1,7 +1,8 @@
 # Add or edit a skill for an existing target
 
-Use this when the CLI already has a runnable corpus. Today that means
-`examples/gh/`. If the requested CLI has no corpus or shim, stop and load
+Use this when the CLI already has a runnable corpus. Current targets:
+`examples/gh/` (reference example) and `targets/agent-bot/` (production).
+If the requested CLI has no corpus or shim, stop and load
 `add-target.md` first.
 
 Read these design references before authoring:
@@ -113,10 +114,10 @@ Requirements:
 
 ## 6. Regenerate and validate
 
-For the current `examples/gh/` implementation:
+For the target you are working on:
 
 ```console
-cd examples/gh
+cd <target-dir>
 make manifest
 make test
 make check

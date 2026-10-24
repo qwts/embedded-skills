@@ -1,7 +1,9 @@
-package main
+package shim
 
 import (
 	"context"
+	"embed"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,7 +15,7 @@ import (
 
 const exportMarker = ".embedded-skills-export"
 
-// exportCmd: gh skills export <name> [--to <dir>] [--strict]
+// exportCmd: <target> skills export <name> [--to <dir>] [--strict]
 // The only skills command that writes (docs/01).
 func exportCmd(cat *Catalog, args []string) int {
 	if len(args) == 0 {
@@ -58,7 +60,7 @@ func exportCmd(cat *Catalog, args []string) int {
 		return 1
 	}
 	for _, ref := range s.References {
-		data, err := corpus.ReadFile(filepath.ToSlash(filepath.Join(filepath.Dir(s.Path), ref)))
+		data, err := cat.corpus.ReadFile(filepath.ToSlash(filepath.Join(filepath.Dir(s.Path), ref)))
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return 1
@@ -73,7 +75,7 @@ func exportCmd(cat *Catalog, args []string) int {
 			return 1
 		}
 	}
-	_ = os.WriteFile(filepath.Join(to, exportMarker), []byte("exported by embedded-skills example shim\n"), 0o644)
+	_ = os.WriteFile(filepath.Join(to, exportMarker), []byte("exported by embedded-skills shim\n"), 0o644)
 	fmt.Println(to)
 	return 0
 }
@@ -85,11 +87,11 @@ var namePattern = regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
 // this example). Command-path checks run `<real> <path...> --help` when a
 // real binary is resolvable; flag-level validation against help output is
 // the production design's job (docs/06 help adapters) and out of scope here.
-func checkCmd(cat *Catalog) int {
+func checkCmd(target string, cat *Catalog) int {
 	var problems []string
 	real, realErr := resolveRealBinary(target)
 	for _, ms := range cat.Manifest.Skills {
-		data, err := corpus.ReadFile(ms.Path)
+		data, err := cat.corpus.ReadFile(ms.Path)
 		if err != nil {
 			problems = append(problems, err.Error())
 			continue
@@ -176,4 +178,188 @@ func commandExists(real, cmdPath string) bool {
 	cmd := exec.CommandContext(ctx, real, args...)
 	cmd.Env = childEnv(real)
 	return cmd.Run() == nil
+}
+
+// --- skills subcommand ---
+
+func skillsCmd(target string, corpus embed.FS, args []string) int {
+	cat, err := loadCatalog(corpus)
+	if err != nil {
+		return corpusError(err)
+	}
+	if len(cat.Skills) == 0 {
+		fmt.Fprintln(os.Stderr, "no skills embedded for this target")
+		return 3
+	}
+	if len(args) == 0 {
+		return printList(target, cat, cat.Skills, false)
+	}
+	switch args[0] {
+	case "--json":
+		return printList(target, cat, filterArgs(cat, args[1:]), true)
+	case "--level", "--tag":
+		return printList(target, cat, filterArgs(cat, args), hasJSON(args))
+	case "search":
+		if len(args) < 2 {
+			fmt.Fprintln(os.Stderr, "usage: skills search <query>")
+			return 2
+		}
+		return printList(target, cat, cat.search(strings.Join(args[1:], " ")), false)
+	case "export":
+		return exportCmd(cat, args[1:])
+	case "check":
+		return checkCmd(target, cat)
+	default:
+		return showSkill(cat, args)
+	}
+}
+
+func hasJSON(args []string) bool {
+	for _, a := range args {
+		if a == "--json" {
+			return true
+		}
+	}
+	return false
+}
+
+func filterArgs(cat *Catalog, args []string) []*Skill {
+	skills := cat.Skills
+	for i := 0; i+1 < len(args); i += 2 {
+		skills = filter(skills, args[i], args[i+1])
+	}
+	return skills
+}
+
+func filter(skills []*Skill, flag, value string) []*Skill {
+	var out []*Skill
+	for _, s := range skills {
+		switch flag {
+		case "--level":
+			if s.Level == value {
+				out = append(out, s)
+			}
+		case "--tag":
+			for _, t := range s.Tags {
+				if t == value {
+					out = append(out, s)
+				}
+			}
+		default:
+			return skills
+		}
+	}
+	return out
+}
+
+func (c *Catalog) search(query string) []*Skill {
+	q := strings.ToLower(query)
+	var out []*Skill
+	for _, s := range c.Skills {
+		hay := strings.ToLower(strings.Join(append([]string{s.Name, s.Description}, append(s.Tags, s.Triggers...)...), " "))
+		if strings.Contains(hay, q) {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+// detectedVersion probes the real binary once, skills path only.
+func (c *Catalog) detectedVersion(target string) string {
+	real, err := resolveRealBinary(target)
+	if err != nil {
+		return ""
+	}
+	return probeVersion(real, c.Manifest.VersionProbe)
+}
+
+func (c *Catalog) versionOK(s *Skill, detected string) bool {
+	if detected == "" || s.MinVersion == "" {
+		return true // unknown is not a violation; detected_version is null
+	}
+	return versionGE(detected, s.MinVersion)
+}
+
+func printList(target string, cat *Catalog, skills []*Skill, asJSON bool) int {
+	skills = cat.sorted(skills)
+	detected := cat.detectedVersion(target)
+	if asJSON {
+		type entry struct {
+			Name        string   `json:"name"`
+			Description string   `json:"description"`
+			Level       string   `json:"level"`
+			Tags        []string `json:"tags"`
+			Commands    []string `json:"commands"`
+			VersionOK   bool     `json:"version_ok"`
+		}
+		out := struct {
+			Version         int     `json:"version"`
+			DetectedVersion *string `json:"detected_version"`
+			Skills          []entry `json:"skills"`
+		}{Version: 1}
+		if detected != "" {
+			out.DetectedVersion = &detected
+		}
+		for _, s := range skills {
+			out.Skills = append(out.Skills, entry{s.Name, s.Description, s.Level, orEmpty(s.Tags), orEmpty(s.Commands), cat.versionOK(s, detected)})
+		}
+		if out.Skills == nil {
+			out.Skills = []entry{}
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if err := enc.Encode(out); err != nil {
+			return 1
+		}
+		return 0
+	}
+	wName, wLevel := len("NAME"), len("LEVEL")
+	for _, s := range skills {
+		if len(s.Name) > wName {
+			wName = len(s.Name)
+		}
+		if len(s.Level) > wLevel {
+			wLevel = len(s.Level)
+		}
+	}
+	fmt.Printf("%-*s  %-*s  DESCRIPTION\n", wName, "NAME", wLevel, "LEVEL")
+	for _, s := range skills {
+		fmt.Printf("%-*s  %-*s  %s\n", wName, s.Name, wLevel, s.Level, s.Description)
+		if !cat.versionOK(s, detected) {
+			fmt.Fprintf(os.Stderr, "warning: %s needs %s >= %s (detected %s)\n", s.Name, target, s.MinVersion, detected)
+		}
+	}
+	fmt.Printf("\nLoad one with: %s skills <name>\n", target)
+	return 0
+}
+
+func orEmpty(v []string) []string {
+	if v == nil {
+		return []string{}
+	}
+	return v
+}
+
+func showSkill(cat *Catalog, args []string) int {
+	name := args[0]
+	s := cat.find(name)
+	if s == nil {
+		return unknownSkill(cat, name)
+	}
+	if hasJSON(args[1:]) {
+		out := map[string]any{
+			"version": 1, "name": s.Name, "description": s.Description,
+			"level": s.Level, "tags": orEmpty(s.Tags), "commands": orEmpty(s.Commands),
+			"prerequisites": orEmpty(s.Prerequisites), "next": orEmpty(s.Next),
+			"body": strings.TrimPrefix(s.Body, "\n"), "references": orEmpty(s.References),
+		}
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		if err := enc.Encode(out); err != nil {
+			return 1
+		}
+		return 0
+	}
+	fmt.Print(ensureNewline(s.Raw)) // verbatim: the document agents already parse
+	return 0
 }

@@ -1,4 +1,4 @@
-package main
+package shim
 
 import (
 	"crypto/sha256"
@@ -11,9 +11,6 @@ import (
 	"sort"
 	"strings"
 )
-
-//go:embed skills manifest.json
-var corpus embed.FS
 
 type VersionProbe struct {
 	Args  []string `json:"args"`
@@ -45,9 +42,10 @@ type Catalog struct {
 	Manifest Manifest
 	Skills   []*Skill
 	byName   map[string]*Skill
+	corpus   embed.FS
 }
 
-func loadCatalog() (*Catalog, error) {
+func loadCatalog(corpus embed.FS) (*Catalog, error) {
 	raw, err := corpus.ReadFile("manifest.json")
 	if err != nil {
 		return nil, err
@@ -56,7 +54,7 @@ func loadCatalog() (*Catalog, error) {
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return nil, fmt.Errorf("manifest.json: %w", err)
 	}
-	c := &Catalog{Manifest: m, byName: map[string]*Skill{}}
+	c := &Catalog{Manifest: m, byName: map[string]*Skill{}, corpus: corpus}
 	for _, ms := range m.Skills {
 		data, err := corpus.ReadFile(ms.Path)
 		if err != nil {
@@ -66,7 +64,7 @@ func loadCatalog() (*Catalog, error) {
 		if err != nil {
 			return nil, err
 		}
-		refs, err := skillReferences(path.Dir(ms.Path))
+		refs, err := skillReferences(corpus, path.Dir(ms.Path))
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +78,7 @@ func loadCatalog() (*Catalog, error) {
 	return c, nil
 }
 
-func skillReferences(skillDir string) ([]string, error) {
+func skillReferences(corpus embed.FS, skillDir string) ([]string, error) {
 	refsDir := skillDir + "/references"
 	entries, err := fs.ReadDir(corpus, refsDir)
 	if err != nil {
@@ -97,6 +95,15 @@ func skillReferences(skillDir string) ([]string, error) {
 }
 
 func (c *Catalog) find(name string) *Skill { return c.byName[name] }
+
+// Find returns the skill with the given name, or nil.
+func (c *Catalog) Find(name string) *Skill { return c.byName[name] }
+
+// LoadCatalogForTest loads a catalog from an embed.FS for testing.
+func LoadCatalogForTest(corpus embed.FS) (*Catalog, error) { return loadCatalog(corpus) }
+
+// Checksum returns the sha256 checksum of data in the manifest format.
+func Checksum(data []byte) string { return checksum(data) }
 
 func levelRank(level string) int {
 	switch level {
