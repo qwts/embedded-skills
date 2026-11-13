@@ -1,7 +1,7 @@
 {
   "version": 1,
   "target": "agent-bot",
-  "target_version": "\u003e=0.12.0 \u003c0.13.0",
+  "target_version": "\u003e=0.15.18 \u003c0.16.0",
   "version_probe": {
     "args": [
       "--version"
@@ -35,6 +35,27 @@
       "checksum": "sha256:465945cc14784d244b70d8c33a8e8276fc6af7e960623914170ae49678652aaa"
     },
     {
+      "name": "publish-mcp",
+      "path": "skills/publish-mcp/SKILL.md",
+      "description": "Start a soul-bound worktree, review a change, and publish a verified bot commit and draft PR through hosted Agent Bot MCP when cloud credentials override local GitHub writes.",
+      "level": "advanced",
+      "tags": [
+        "cloud",
+        "mcp",
+        "worktree",
+        "identity",
+        "commit",
+        "publish"
+      ],
+      "commands": [
+        "start",
+        "doctor"
+      ],
+      "prerequisites": [],
+      "next": [],
+      "checksum": "sha256:18078cc509805216ac725cea1c591f6fa94dd119ea7043f681d4a2b8df648447"
+    },
+    {
       "name": "verified-publish",
       "path": "skills/verified-publish/SKILL.md",
       "description": "Publish bot-authored commits with GitHub-verified signatures. Use when you need to push signed commits as a bot identity to a repository",
@@ -52,7 +73,7 @@
       ],
       "prerequisites": [],
       "next": [],
-      "checksum": "sha256:45bdee41d3f29d1f317baeee351d76412bbc5d412b295826d00348b84d0fd82f"
+      "checksum": "sha256:5fd4790c80fba2aa508e8f7e642198c4aaeade5ceb7a58d1a2f036f62e23b2ad"
     }
   ]
 }

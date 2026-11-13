@@ -28,6 +28,10 @@ tree, then updates the remote branch under a force-with-lease equivalent.
 Do not use this for human-authored commits or when you are not operating under
 a bot identity.
 
+If a cloud egress proxy replaces GitHub credentials, load `publish-mcp`
+instead. Local token selection and `signed-commit` cannot prove the upstream
+bot identity there; hosted MCP must perform the GitHub writes.
+
 ## Steps
 
 1. Verify the live session binding is established. A worktree can resolve a

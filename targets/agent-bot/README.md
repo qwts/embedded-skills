@@ -19,11 +19,12 @@ targets/agent-bot/
 ├── manifest.json        generated index of the corpus (do not edit)
 ├── skills/
 │   ├── verified-publish/SKILL.md   advanced, destructive
-│   └── join-and-bind/SKILL.md      intermediate, mutating
+│   ├── join-and-bind/SKILL.md      intermediate, mutating
+│   └── publish-mcp/               cloud worktree → signed bot commit → draft PR
 └── README.md            this file
 ```
 
-Two skills, chosen by failure frequency from agent session mining:
+Three skills, chosen from agent session failures and user workflow requests:
 
 - **`verified-publish`** — the `agent-bot signed-commit` flow: identity
   preconditions, dry-run, publish, recovery, verifying GitHub shows the
@@ -31,15 +32,20 @@ Two skills, chosen by failure frequency from agent session mining:
 - **`join-and-bind`** — `agent-bot join`, `setup-worktree`, MCP bind,
   `doctor`, and the failure modes that fail closed (missing App, missing
   binding, wrong checkout).
+- **`publish-mcp`** — current `start` startup, live binding verification,
+  internal review, and server-side signed publishing plus a draft PR when
+  cloud credentials override local GitHub writes. Its
+  [test workflow](skills/publish-mcp/references/test-workflow.md) records the
+  trial, failures, recovery, and evaluation limits.
 
-Both skills reconcile with the existing `agent-bot skill` surface: they
+These skills reconcile with the existing `agent-bot skill` surface: they
 present the same workflows as standalone, discoverable procedures without
 duplicating the bundled `--for` references.
 
 ## Prerequisites
 
 - Go 1.23+ (to build)
-- `agent-bot` v0.12.0 installed and on `PATH` (tested range: `>=0.12.0 <0.13.0`)
+- `agent-bot` v0.15.18 installed and on `PATH` (corpus range: `>=0.15.18 <0.16.0`)
 
 ## Build
 
@@ -77,7 +83,7 @@ The real `agent-bot` was never modified.
 ## Verify
 
 ```console
-$ agent-bot skills                  # catalog: join-and-bind, verified-publish
+$ agent-bot skills                  # catalog: join-and-bind, verified-publish, publish-mcp
 $ agent-bot skills --json           # machine-readable, with detected_version
 $ agent-bot skills verified-publish # one full workflow, verbatim
 $ agent-bot skills search publish   # search by keyword
