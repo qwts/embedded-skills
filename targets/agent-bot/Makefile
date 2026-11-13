@@ -19,7 +19,7 @@ build:
 # Staleness is caught by `make test` (checksum gate) and `make check`,
 # which refuse to run against a manifest that disagrees with skills/.
 manifest:
-	$(GENMANIFEST) . agent-bot ">=0.12.0 <0.13.0" '(\d+\.\d+(\.\d+)?)'
+	$(GENMANIFEST) . agent-bot ">=0.15.18 <0.16.0" '(\d+\.\d+(\.\d+)?)'
 
 test:
 	$(GO) test ./...
