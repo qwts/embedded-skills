@@ -116,11 +116,11 @@ correct soul attribution, and a draft PR authored by the intended App.
 
    ```text
    call_tool({"name":"get_commit_identity","arguments":{"repo":"<owner/repo>","sha":"<published-sha>"}})
-   call_tool({"name":"github_read","arguments":{"harness":"<resolved-app>","repo":"<owner/repo>","path":"git/commits/<published-sha>"}})
+   call_tool({"name":"github_read","arguments":{"harness":"<resolved-app>","repo":"<owner/repo>","path":"commits/<published-sha>"}})
    ```
 
    Require the intended bot author, verified signature, soul trailers, and a
-   tree SHA equal to the tested local tree (`git rev-parse HEAD^{tree}`). If
+   `data.commit.tree.sha` equal to the tested local tree (`git rev-parse HEAD^{tree}`). If
    the tree differs, stop and investigate; do not report a successful publish.
    Read the remote branch head after a timeout before retrying a remote write.
 

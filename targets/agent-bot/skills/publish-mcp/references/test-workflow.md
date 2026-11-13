@@ -97,6 +97,15 @@ with `github_pull_request`, then read it back to confirm author, head and
 draft state. The PR is the durable remote receipt; no local GitHub write is
 part of this procedure.
 
+The first live `sign_commit` created commit
+`3398649725bddf721bc21b725a4c1456d1dbdb56` as `trueline-codex-agent[bot]`.
+`get_commit_identity` returned `is_bot:true`, `verified:true`, and the expected
+local soul attribution. The commit's tree matched the tested local tree.
+Verification initially tried `git/commits/<sha>`, which `github_read` refused
+as an unsupported path. The supported `commits/<sha>` read succeeded; its
+`data.commit.tree.sha` and `data.commit.verification.verified` supplied the
+tree and signature checks. The skill was corrected before opening the PR.
+
 ## Evaluation limits
 
 This is a manual live workflow trial, not a controlled two-agent evaluation.
